@@ -1,4 +1,3 @@
--- Store the original position of the player
 local player = game.Players.LocalPlayer
 local character = player.Character
 local humanoidRootPart = character and character:FindFirstChild("HumanoidRootPart")
@@ -9,32 +8,50 @@ if not humanoidRootPart then
     return
 end
 
+-- Store the original position of the player
 local originalPosition = humanoidRootPart.CFrame
 local playerName = player.Name
 
-for i, v in pairs(game.Workspace.Plots:GetChildren()) do
+local plotNumber = nil
+
+-- Find the plot number based on the player's factory title
+for _, plot in pairs(game.Workspace.Plots:GetChildren()) do
     -- Check if the plot name is a number between 1 and 8
-    if tonumber(v.Name) and tonumber(v.Name) >= 1 and tonumber(v.Name) <= 8 then
-        -- Check if Core and MainSign exist within the plot
-        local core = v:FindFirstChild("Core")
+    if tonumber(plot.Name) and tonumber(plot.Name) >= 1 and tonumber(plot.Name) <= 8 then
+        local core = plot:FindFirstChild("Core")
         if core then
             local mainSign = core:FindFirstChild("MainSign")
             if mainSign then
                 local title = mainSign:FindFirstChild("SurfaceGui") and mainSign.SurfaceGui:FindFirstChild("Title")
                 if title and title.Text == playerName .. "'s Factory" then
-                    -- Teleport the player to the Sell location and invoke server function
-                    local sell = core:FindFirstChild("Sell")
-                    if sell then
-                        humanoidRootPart.CFrame = sell.CFrame
-                        wait(3) -- Wait for the teleport
-                        game:GetService("ReplicatedStorage"):WaitForChild("Communication"):WaitForChild("SellItems"):InvokeServer()
-                        
-                        -- Teleport the player back to the original position
-                        humanoidRootPart.CFrame = originalPosition
-                        break -- Exit the loop if you only want to perform this action once
-                    end
+                    plotNumber = plot.Name
+                    break
                 end
             end
         end
     end
+end
+
+if plotNumber then
+    -- Teleport to the Sell part
+    local sellPart = game.Workspace.Plots[plotNumber].Core:FindFirstChild("Sell")
+    if sellPart then
+        humanoidRootPart.CFrame = sellPart.CFrame
+
+        -- Wait for a short period to ensure the teleportation has completed
+        wait(0.5)  -- Adjust if needed to ensure teleportation completion
+
+        -- Run the server function
+        game:GetService("ReplicatedStorage"):WaitForChild("Communication"):WaitForChild("SellItems"):InvokeServer()
+
+        -- Wait for 3 seconds before teleporting back
+        wait(3)
+
+        -- Teleport back to the original position
+        humanoidRootPart.CFrame = originalPosition
+    else
+        warn("Sell part not found in the player's plot.")
+    end
+else
+    warn("Plot number not found for the player's factory.")
 end
