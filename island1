@@ -47,8 +47,8 @@ if plotNumber then
         }
         game:GetService("ReplicatedStorage"):WaitForChild("Communication"):WaitForChild("CollectSkyIslandTank"):FireServer(unpack(args))
 
-        -- Wait for 3 seconds before teleporting back
-        wait(3)
+        -- Wait for 4 seconds before teleporting back
+        wait(4)
 
         -- Teleport back to the original position
         humanoidRootPart.CFrame = originalPosition
