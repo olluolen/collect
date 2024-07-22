@@ -1,0 +1,60 @@
+local player = game.Players.LocalPlayer
+local character = player.Character
+local humanoidRootPart = character and character:FindFirstChild("HumanoidRootPart")
+
+-- Check if the HumanoidRootPart exists
+if not humanoidRootPart then
+    warn("HumanoidRootPart not found in the player's character.")
+    return
+end
+
+-- Store the original position of the player
+local originalPosition = humanoidRootPart.CFrame
+local playerName = player.Name
+
+local plotNumber = nil
+
+-- Find the plot number based on the player's factory title
+for _, plot in pairs(game.Workspace.Plots:GetChildren()) do
+    -- Check if the plot name is a number between 1 and 8
+    if tonumber(plot.Name) and tonumber(plot.Name) >= 1 and tonumber(plot.Name) <= 8 then
+        local core = plot:FindFirstChild("Core")
+        if core then
+            local mainSign = core:FindFirstChild("MainSign")
+            if mainSign then
+                local title = mainSign:FindFirstChild("SurfaceGui") and mainSign.SurfaceGui:FindFirstChild("Title")
+                if title and title.Text == playerName .. "'s Factory" then
+                    plotNumber = plot.Name
+                    break
+                end
+            end
+        end
+    end
+end
+
+if plotNumber then
+    -- Teleport to the specified location
+    local targetLocation = game.Workspace.Plots[plotNumber].Islands.Island2.Core.Display
+    if targetLocation then
+        humanoidRootPart.CFrame = targetLocation.CFrame
+
+        -- Wait for a short period to ensure the teleportation has completed
+        wait(0.5)  -- Adjust if needed to ensure teleportation completion
+
+        -- Run the server function
+        local args = {
+            [1] = "Island2"
+        }
+        game:GetService("ReplicatedStorage"):WaitForChild("Communication"):WaitForChild("CollectSkyIslandTank"):FireServer(unpack(args))
+
+        -- Wait for 4 seconds before teleporting back
+        wait(4)
+
+        -- Teleport back to the original position
+        humanoidRootPart.CFrame = originalPosition
+    else
+        warn("Target location not found.")
+    end
+else
+    warn("Plot number not found for the player's factory.")
+end
