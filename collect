@@ -1,9 +1,3 @@
--- Reference to ReplicatedStorage
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
--- Find the username value in ReplicatedStorage
-local usernameValue = ReplicatedStorage:WaitForChild("UsernameInput")
-
 -- Store the original position of the player
 local player = game.Players.LocalPlayer
 local character = player.Character
@@ -16,12 +10,8 @@ if not humanoidRootPart then
 end
 
 local originalPosition = humanoidRootPart.CFrame
+local playerName = player.Name
 
--- Retrieve the username from ReplicatedStorage
-local usernameInput = usernameValue.Value
-local formattedTitle = usernameInput .. "'s Factory"
-
--- Iterate through the plots
 for i, v in pairs(game.Workspace.Plots:GetChildren()) do
     -- Check if the plot name is a number between 1 and 8
     if tonumber(v.Name) and tonumber(v.Name) >= 1 and tonumber(v.Name) <= 8 then
@@ -31,12 +21,12 @@ for i, v in pairs(game.Workspace.Plots:GetChildren()) do
             local mainSign = core:FindFirstChild("MainSign")
             if mainSign then
                 local title = mainSign:FindFirstChild("SurfaceGui") and mainSign.SurfaceGui:FindFirstChild("Title")
-                if title and title.Text == formattedTitle then
+                if title and title.Text == playerName .. "'s Factory" then
                     -- Teleport the player to the Sell location and invoke server function
                     local sell = core:FindFirstChild("Sell")
                     if sell then
                         humanoidRootPart.CFrame = sell.CFrame
-                        wait(1) -- Wait for the teleport
+                        wait(3) -- Wait for the teleport
                         game:GetService("ReplicatedStorage"):WaitForChild("Communication"):WaitForChild("SellItems"):InvokeServer()
                         
                         -- Teleport the player back to the original position
