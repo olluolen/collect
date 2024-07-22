@@ -39,13 +39,16 @@ if plotNumber then
         humanoidRootPart.CFrame = targetLocation.CFrame
 
         -- Wait for a short period to ensure the teleportation has completed
-        wait(3)
+        wait(0.5)  -- Adjust if needed to ensure teleportation completion
 
         -- Run the server function
         local args = {
             [1] = "Island1"
         }
         game:GetService("ReplicatedStorage"):WaitForChild("Communication"):WaitForChild("CollectSkyIslandTank"):FireServer(unpack(args))
+
+        -- Wait for 3 seconds before teleporting back
+        wait(3)
 
         -- Teleport back to the original position
         humanoidRootPart.CFrame = originalPosition
